@@ -1,5 +1,4 @@
-#ifndef ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_THREAD_POOL_H_
-#define ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_THREAD_POOL_H_
+#pragma once
 
 #include <condition_variable>
 #include <functional>
@@ -56,5 +55,3 @@ class ThreadPool {
 
     std::atomic<bool> stopped_;
 };
-
-#endif  // ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_THREAD_POOL_H_
