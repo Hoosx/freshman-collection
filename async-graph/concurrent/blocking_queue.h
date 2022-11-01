@@ -1,5 +1,4 @@
-#ifndef ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_BLOCKING_QUEUE_H_
-#define ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_BLOCKING_QUEUE_H_
+#pragma once
 
 #include <condition_variable>
 #include <list>
@@ -24,8 +23,9 @@ class BlockingQueue {
     std::optional<T> Take() {
         std::unique_lock<std::mutex> guard(mu_);
         cond_.wait(guard, [this] { return !queue_.empty() || closed_; });
-        if (queue_.empty() && closed_)
-        { return std::nullopt; }
+        if (queue_.empty() && closed_) {
+            return std::nullopt;
+        }
         auto element = queue_.front();
         queue_.pop_front();
         return element;
@@ -52,5 +52,3 @@ class BlockingQueue {
     std::list<T> queue_;
     bool closed_ = false;
 };
-
-#endif  // ASYNC_GRAPH_ASYNC_GRAPH_CONCURRENT_BLOCKING_QUEUE_H_

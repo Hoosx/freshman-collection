@@ -1,39 +1,42 @@
 #include <chrono>
 #include <iostream>
 
-#include "concurrent/thread_pool.h"
 #include "core/executor.h"
 #include "core/func_register.h"
 
-void kernel1(KernelFrame* frame) {
-    auto val1 = frame->GetInput<int>(0);
-    std::cout << "Kernel1 val: " << val1 << std::endl;
-    frame->SetOutput(static_cast<float>(val1 * 2));
+void Kernel1(KernelContext* frame) {
+    auto val = frame->GetInput<int>(0);
+    std::cout << "Kernel1 val: " << val << std::endl;
+    frame->AddOutput(val);
 }
 
-void kernel2(KernelFrame* frame) {
-    auto val1 = frame->GetInput<int>(0);
-    std::cout << "Kernel2 val: " << val1 << std::endl;
-    frame->SetOutput(static_cast<float>(val1 * 2));
+void Kernel2(KernelContext* frame) {
+    auto val = frame->GetInput<int>(0);
+    std::cout << "Kernel2 val: " << val << std::endl;
+    frame->AddOutput(val);
 }
 
-void kernel3(KernelFrame* frame) {
-    auto val1 = frame->GetInput<int>(0);
-    std::cout << "Kernel3 val: " << val1 << std::endl;
+void Kernel3(KernelContext* frame) {
+    auto val0 = frame->GetInput<int>(0);
+    auto val1 = frame->GetInput<int>(1);
+    std::cout << "Kernel3 val: " << val0 + val1 << std::endl;
+    frame->AddOutput(val0 + val1);
 }
 
 int main() {
     Graph graph;
-    auto ptr1 = new TaskNode{{}, &kernel1, ""};
-    auto ptr2 = new TaskNode{{""}, &kernel2, "kernel2"};
-    auto ptr3 = new TaskNode{{"kernel2"}, &kernel3, "kernel3"};
-    ptr1->AddSuccessor(ptr2);
+    auto ptr1 = new TaskNode{&Kernel1, "Kernel1"};
+    auto ptr2 = new TaskNode{&Kernel2, "Kernel2"};
+    auto ptr3 = new TaskNode{&Kernel3, "Kernel3"};
+    ptr1->AddSuccessor(ptr3);
     ptr2->AddSuccessor(ptr3);
+    ptr1->GetContext()->AddInput(3);
+    ptr2->GetContext()->AddInput(4);
     graph.AddNode(ptr1);
     graph.AddNode(ptr2);
     graph.AddNode(ptr3);
     graph.Build();
-
-    auto results = graph.Run();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    graph.Run();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cout << graph.GetNode("Kernel3")->GetContext()->GetOutput<int>(0) << std::endl;
 }

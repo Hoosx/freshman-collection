@@ -1,12 +1,11 @@
-#ifndef ASYNC_GRAPH_ASYNC_GRAPH_CORE_FUNCREGISTER_H_
-#define ASYNC_GRAPH_ASYNC_GRAPH_CORE_FUNCREGISTER_H_
+#pragma once
 
 #include <functional>
 #include <string>
 
 #include "kernel_frame.h"
 
-using KernelFunc = std::function<void(KernelFrame*)>;
+using KernelFunc = std::function<void(KernelContext*)>;
 
 class FuncRegister {
    public:
@@ -14,20 +13,12 @@ class FuncRegister {
         func_map_.insert(std::make_pair(func_name, func));
     }
 
-    KernelFunc GetFunc(const std::string& func_name){
-        return func_map_[func_name];
-    }
+    KernelFunc GetFunc(const std::string& func_name) { return func_map_[func_name]; }
 
-    void RemoveFunc(const std::string& func_name) {
-        func_map_.erase(func_name);
-    }
+    void RemoveFunc(const std::string& func_name) { func_map_.erase(func_name); }
 
    private:
     std::unordered_map<std::string, KernelFunc> func_map_;
 };
 
-void RegisterKernelFunc(KernelFunc&& func){
-
-}
-
-#endif  // ASYNC_GRAPH_ASYNC_GRAPH_CORE_FUNCREGISTER_H_
+void RegisterKernelFunc(KernelFunc&& func) {}
